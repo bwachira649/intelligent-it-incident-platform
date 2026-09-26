@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <meta
+        name="description"
+        content="Operational incident management dashboard"
+    >
+    <title>Incident Management Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">IM</div>
+
+            <div>
+                <h1>Incident Management</h1>
+                <p>Operational Alert &amp; Response Platform</p>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <span
+                id="system-status"
+                class="status-indicator"
+            >
+                Checking system...
+            </span>
+
+            <button
+                id="refresh-button"
+                class="button button-primary"
+                type="button"
+            >
+                Refresh
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="page-heading">
+            <div>
+                <h2>Operations Dashboard</h2>
+                <p>
+                    Monitor incidents, severity levels, and response activity
+                    from a single operational view.
+                </p>
+            </div>
+
+            <div class="last-updated">
+                Last updated:
+                <span id="last-updated">Never</span>
+            </div>
+        </section>
+
+        <section
+            id="error-banner"
+            class="error-banner hidden"
+            role="alert"
+        >
+            <strong>Dashboard error:</strong>
+            <span id="error-message"></span>
+        </section>
+
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-label">Total Incidents</div>
+                <div
+                    id="total-incidents"
+                    class="stat-value"
+                >
+                    —
+                </div>
+                <div class="stat-description">
+                    All recorded incidents
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-label">Open</div>
+                <div
+                    id="open-incidents"
+                    class="stat-value"
+                >
+                    —
+                </div>
+                <div class="stat-description">
+                    Awaiting response
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-label">Acknowledged</div>
+                <div
+                    id="acknowledged-incidents"
+                    class="stat-value"
+                >
+                    —
+                </div>
+                <div class="stat-description">
+                    Being investigated
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-label">Resolved</div>
+                <div
+                    id="resolved-incidents"
+                    class="stat-value"
+                >
+                    —
+                </div>
+                <div class="stat-description">
+                    Completed incidents
+                </div>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3>Severity Overview</h3>
+                        <p>
+                            Current incident distribution by severity.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="severity-list">
+                    <div class="severity-row">
+                        <div class="severity-name">
+                            <span class="severity-dot severity-low"></span>
+                            Low
+                        </div>
+
+                        <strong id="low-incidents">—</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <div class="severity-name">
+                            <span class="severity-dot severity-medium"></span>
+                            Medium
+                        </div>
+
+                        <strong id="medium-incidents">—</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <div class="severity-name">
+                            <span class="severity-dot severity-high"></span>
+                            High
+                        </div>
+
+                        <strong id="high-incidents">—</strong>
+                    </div>
+
+                    <div class="severity-row">
+                        <div class="severity-name">
+                            <span class="severity-dot severity-critical"></span>
+                            Critical
+                        </div>
+
+                        <strong id="critical-incidents">—</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h3>System Status</h3>
+                        <p>
+                            Application health and dashboard connectivity.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="system-status-content">
+                    <div class="health-check">
+                        <span
+                            id="health-dot"
+                            class="health-dot"
+                        ></span>
+
+                        <div>
+                            <strong id="health-status">
+                                Checking...
+                            </strong>
+
+                            <p id="health-description">
+                                Connecting to the incident platform API.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="system-detail">
+                        <span>API</span>
+                        <strong id="api-status">Checking</strong>
+                    </div>
+
+                    <div class="system-detail">
+                        <span>Environment</span>
+                        <strong id="environment-status">—</strong>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="panel create-incident-panel">
+            <div class="panel-header">
+                <div>
+                    <h3>Create Incident</h3>
+                    <p>
+                        Register a new operational incident and trigger the
+                        appropriate alert workflow.
+                    </p>
+                </div>
+            </div>
+
+            <form
+                id="create-incident-form"
+                class="incident-form"
+            >
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="incident-title">
+                            Incident Title
+                        </label>
+
+                        <input
+                            id="incident-title"
+                            name="title"
+                            type="text"
+                            minlength="3"
+                            maxlength="200"
+                            placeholder="e.g. Production API unavailable"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="incident-description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="incident-description"
+                            name="description"
+                            rows="4"
+                            minlength="3"
+                            placeholder="Describe the operational issue and its impact."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="incident-severity">
+                            Severity
+                        </label>
+
+                        <select
+                            id="incident-severity"
+                            name="severity"
+                            required
+                        >
+                            <option value="low">
+                                Low
+                            </option>
+
+                            <option value="medium" selected>
+                                Medium
+                            </option>
+
+                            <option value="high">
+                                High
+                            </option>
+
+                            <option value="critical">
+                                Critical
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="incident-source">
+                            Source
+                        </label>
+
+                        <input
+                            id="incident-source"
+                            name="source"
+                            type="text"
+                            minlength="2"
+                            maxlength="100"
+                            placeholder="e.g. api-health-check"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        id="create-incident-button"
+                        class="button button-primary"
+                        type="submit"
+                    >
+                        Create Incident
+                    </button>
+
+                    <span
+                        id="create-incident-status"
+                        class="form-status"
+                        aria-live="polite"
+                    ></span>
+                </div>
+            </form>
+        </section>
+
+        <section class="panel incidents-panel">
+            <div class="panel-header">
+                <div>
+                    <h3>Recent Incidents</h3>
+                    <p>
+                        Latest operational incidents recorded by the platform.
+                    </p>
+                </div>
+
+                <div class="incident-count">
+                    Showing
+                    <span id="incident-count">0</span>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Incident</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="incidents-table-body">
+                        <tr>
+                            <td
+                                colspan="6"
+                                class="table-message"
+                            >
+                                Loading incidents...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h3>Selected Incident</h3>
+                    <p>
+                        Incident details and operational response history.
+                    </p>
+                </div>
+            </div>
+
+            <div
+                id="incident-details"
+                class="incident-details empty-state"
+            >
+                Select an incident from the table to view its details.
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>
+            Intelligent IT Incident &amp; Alert Management Platform
+        </p>
+
+        <p>
+            REST API &middot; Automated Notifications &middot;
+            Operational Monitoring
+        </p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
